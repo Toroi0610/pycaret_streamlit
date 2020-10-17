@@ -20,3 +20,4 @@ old/
 /test.csv
 
 /experiment*
+/mlruns
