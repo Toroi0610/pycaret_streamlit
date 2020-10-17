@@ -39,7 +39,7 @@ def get_binary_file_downloader_html(bin_file, file_label='File'):
 
 st.sidebar.image("logo.png", width=200)
 st.sidebar.markdown(
-    "# Auto-ML using pycaret by Toroi"
+    "# Auto-ML using pycaret classification by Toroi"
 )
 
 if st.sidebar.button("Start!!"):

@@ -4,8 +4,7 @@ from shutil import copy2
 import pandas as pd
 
 
-setting = pd.read_csv("setting_automl.csv", index_col=0)
-mode = setting.loc["mode", "property0"]
+mode = "classification"
 # Importing pycaret
 if mode == "classification":
     from pycaret.classification import *
