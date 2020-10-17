@@ -11,7 +11,7 @@ pycaret_example_dir = Path(".").absolute()
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
-
+@st.cache
 def delete_exp_env(path=pycaret_example_dir,
                    ignore_dir=["__pycache__",".git"]):
     from app import Pycaret_CLI
@@ -22,13 +22,13 @@ def delete_exp_env(path=pycaret_example_dir,
     for d in dir_list:
         rmtree(d, ignore_errors=True)
 
-
+@st.cache
 def remove_glob(pathname, recursive=True):
     for p in glob.glob(pathname, recursive=recursive):
         if os.path.isfile(p):
             os.remove(p)
 
-
+@st.cache
 def get_binary_file_downloader_html(bin_file, file_label='File'):
     with open(bin_file, 'rb') as f:
         data = f.read()
@@ -37,27 +37,15 @@ def get_binary_file_downloader_html(bin_file, file_label='File'):
     return href
 
 
-setting = pd.read_csv("setting_automl.csv", index_col=0)
-
 st.sidebar.image("logo.png", width=200)
 st.sidebar.markdown(
     "# Auto-ML using pycaret by Toroi"
 )
 
-experiment_name = st.sidebar.text_input("Experiments name => ", "experiment")
-setting.loc["exp_name", "property0"] = experiment_name
-
-mode = st.sidebar.selectbox(
-    "Pycaret", ["classification", "regression"]
-)
-
 if st.sidebar.button("Start!!"):
     delete_exp_env()
-    setting.loc["mode", "property0"] = mode
-    setting.to_csv("setting_automl.csv")
 
 models = "all"
-
 
 def main():
 
@@ -66,6 +54,9 @@ def main():
 
     uploaded_training_file = None
     uploaded_test_file = None
+    uploaded_setting_file = None
+
+    path_setting_file = "setting.csv"
 
     uploaded_training_file = st.file_uploader("Training data [.csv]",
                                               type=["csv"],
@@ -77,30 +68,39 @@ def main():
                                           encoding='auto',
                                           key=None)
 
+    uploaded_setting_file = st.file_uploader("Experiment setting file [.csv]",
+                                             type=["csv"],
+                                             encoding='auto',
+                                             key=None)
 
-    if uploaded_training_file is not None and uploaded_test_file is not None:
+    print("Training_file: ", uploaded_training_file)
+
+    if uploaded_training_file is not None and uploaded_test_file is not None and uploaded_setting_file is not None:
         work_dir = os.getcwd()
         train = pd.read_csv(uploaded_training_file)
         test = pd.read_csv(uploaded_test_file)
-        target = st.selectbox(
-            "target", list(train.columns)
-        )
-        setting.loc["target", "property0"] = target
-        setting.to_csv("setting_automl.csv")
+        setting = pd.read_csv(uploaded_setting_file, index_col=0)
+        st.dataframe(setting)
+        train.to_csv(setting.loc["path_training_file", "property0"])
+        test.to_csv(setting.loc["path_test_file", "property0"])
 
-        if st.button('Run'):
-            with st.spinner("Training..."):
-                pcl = Pycaret_CLI("setting_automl.csv")
-                exp = pcl.setup_automl_env(train)
-                best_model = pcl.training_model()
-                pred_result = pcl.prediction(best_model, test)
-                os.chdir(work_dir)
-                st.success("Done!")
-                make_archive(pcl.exp_name, 'zip', root_dir=pcl.exp_dir)
-                st.markdown(get_binary_file_downloader_html(f'{pcl.exp_name}.zip', 'ZIP'), unsafe_allow_html=True)
+        setting.to_csv(path_setting_file)
+
+        target = setting.loc["target", "property0"]
+
+        with st.spinner("Training..."):
+            pcl = Pycaret_CLI(path_setting_file)
+            exp = pcl.setup_automl_env(train)
+            best_model = pcl.training_model()
+            pred_result = pcl.prediction(best_model, test)
+            os.chdir(work_dir)
+            st.success("Done!")
+            make_archive(pcl.exp_name, 'zip', root_dir=pcl.exp_dir)
+            st.markdown(get_binary_file_downloader_html(f'{pcl.exp_name}.zip', 'ZIP'), unsafe_allow_html=True)
 
             if st.button("Delete"):
                 delete_exp_env()
+                st.caching.clear_cache()
 
 
 

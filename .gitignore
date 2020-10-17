@@ -18,3 +18,5 @@ old/
 
 /train.csv
 /test.csv
+
+/experiment*
