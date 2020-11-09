@@ -1,3 +1,4 @@
+/*
 env/
 .env
 
@@ -21,3 +22,7 @@ old/
 
 /experiment*
 /mlruns
+
+!streamlit_ui.py
+!app_clssification.py
+!app_regression.py

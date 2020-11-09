@@ -2,9 +2,10 @@ import os
 from pathlib import Path
 from shutil import copy2
 import pandas as pd
+import mlflow
 
 
-mode = "classification"
+mode = "regression"
 # Importing pycaret
 if mode == "classification":
     from pycaret.classification import *
@@ -14,16 +15,17 @@ elif mode  == "regression":
 
 class Pycaret_CLI:
 
-    def __init__(self, path_setting_file):
+    def __init__(self, path_setting_file, model_list):
 
         setting = pd.read_csv(path_setting_file, index_col=0)
-        self.mode = setting.loc["mode", "property0"]
+        # self.mode = setting.loc["mode", "property0"]
         self.path_train_file = setting.loc["path_training_file", "property0"]
         self.path_test_file = setting.loc["path_test_file", "property0"]
         # self.preprocessing = dict(setting.loc["preprocessing", "property0"])
         self.target = setting.loc["target", "property0"]
         self.module = setting.loc["module", "property0"]
-        self.model_list = setting.loc["models"].dropna().values.tolist()
+        # self.model_list = setting.loc["models"].dropna().values.tolist()
+        self.model_list = model_list
         self.metric = setting.loc["metric", "property0"]
         self.exp_name = setting.loc["exp_name", "property0"]
         self.ignore_features = setting.loc["ignore_features"].dropna().values
@@ -36,8 +38,17 @@ class Pycaret_CLI:
         data_dir.mkdir(exist_ok=True)
         setting_dir = (exp_dir / "setting").absolute()
         setting_dir.mkdir(exist_ok=True)
-        predict_dir = (exp_dir / "predcit").absolute()
+        predict_dir = (exp_dir / "predict").absolute()
         predict_dir.mkdir(exist_ok=True)
+        predict_dir.mkdir(exist_ok=True)
+        model_image_dir = (exp_dir / "model" / "image").absolute()
+        model_image_dir.mkdir(exist_ok=True)
+
+        # configure mlflow tracking
+        # database
+        # uri = f'sqlite:///{exp_dir.as_posix()}/experiment.db'
+        # mlflow.set_tracking_uri(uri)
+        uri = f'file:///{exp_dir.as_posix()}/mlruns'
 
         copy2(path_setting_file, setting_dir)
         copy2(self.path_train_file, data_dir)
@@ -48,6 +59,10 @@ class Pycaret_CLI:
         self.data_dir = data_dir
         self.setting_dir = setting_dir
         self.predict_dir = predict_dir
+        self.model_image_dir = model_image_dir
+        self.mlflow_server = uri
+        # artifact
+        self.artifact_uri = f"{exp_dir.as_posix()}/mlruns"
 
 
     def load_data(self):
@@ -72,6 +87,7 @@ class Pycaret_CLI:
                       ignore_features=self.ignore_features,
                       log_experiment=True,
                       log_plots=True, log_profile=True,
+                      log_data=True,
                       experiment_name=self.exp_name)
         print("Finished !!")
 
@@ -101,3 +117,7 @@ class Pycaret_CLI:
         result = predict_model(model, test)
         result.to_csv((self.predict_dir / "result.csv").absolute(), index=False)
         return result
+
+
+    def model_image(self, model):
+        pass

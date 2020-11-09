@@ -1,22 +1,25 @@
 FROM python:3.7
 
-RUN pip install virtualenv
-ENV VIRTUAL_ENV=/venv
-RUN virtualenv venv -p python3
-ENV PATH="VIRTUAL_ENV/bin:$PATH"
 
 WORKDIR /app
-ADD . /app
+ADD logo.png /app
+ADD app.py /app
+ADD streamlit_ui.py /app
+ADD requirements.txt /app
 
 # Install dependencies
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 # copying all files over
-COPY . /app
+COPY logo.png /app
+COPY app.py /app
+COPY streamlit_ui.py /app
+COPY requirements.txt /app
 
-# Expose port 
+# Expose port
 ENV PORT 8501
+ENV PORT 5000
 
 # cmd to launch app when container is run
 CMD streamlit run streamlit_ui.py
