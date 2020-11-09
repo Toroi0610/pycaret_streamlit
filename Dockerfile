@@ -1,24 +1,20 @@
 FROM python:3.7
 
-WORKDIR /app
-ADD logo.png /app
-ADD app_classification.py /app
-ADD app_regression.py /app
-ADD streamlit_ui.py /app
-ADD requirements.txt /app
-ADD base_setting.csv /app
+WORKDIR /application
+ADD /image /application
+ADD /app /application
+ADD streamlit_ui.py /application
+ADD requirements.txt /application
 
 # Install dependencies
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 # copying all files over
-COPY logo.png /app
-COPY app_classification.py /app
-COPY app_regression.py /app
-COPY streamlit_ui.py /app
-COPY requirements.txt /app
-COPY base_setting.csv /app
+COPY /image /application
+COPY /app /application
+COPY streamlit_ui.py /application
+COPY requirements.txt /application
 
 # Expose port
 ENV PORT 8501
