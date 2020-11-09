@@ -7,6 +7,7 @@ ADD app_classification.py /app
 ADD app_regression.py /app
 ADD streamlit_ui.py /app
 ADD requirements.txt /app
+ADD base_setting.csv /app
 
 # Install dependencies
 RUN pip install --upgrade pip
@@ -18,6 +19,7 @@ COPY app_classification.py /app
 COPY app_regression.py /app
 COPY streamlit_ui.py /app
 COPY requirements.txt /app
+COPY base_setting.csv /app
 
 # Expose port
 ENV PORT 8501

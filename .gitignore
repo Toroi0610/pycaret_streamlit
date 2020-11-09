@@ -26,3 +26,4 @@ old/
 !streamlit_ui.py
 !app_classification.py
 !app_regression.py
+!base_setting.csv
