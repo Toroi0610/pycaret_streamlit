@@ -1,6 +1,5 @@
 FROM python:3.7
 
-
 WORKDIR /app
 ADD logo.png /app
 ADD app_classification.py /app

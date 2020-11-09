@@ -27,3 +27,4 @@ old/
 !app_classification.py
 !app_regression.py
 !base_setting.csv
+!/sample_data
