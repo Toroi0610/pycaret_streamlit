@@ -3,7 +3,8 @@ FROM python:3.7
 
 WORKDIR /app
 ADD logo.png /app
-ADD app.py /app
+ADD app_classification.py /app
+ADD app_regression.py /app
 ADD streamlit_ui.py /app
 ADD requirements.txt /app
 
@@ -13,7 +14,8 @@ RUN pip install -r requirements.txt
 
 # copying all files over
 COPY logo.png /app
-COPY app.py /app
+COPY app_classification.py /app
+COPY app_regression.py /app
 COPY streamlit_ui.py /app
 COPY requirements.txt /app
 
