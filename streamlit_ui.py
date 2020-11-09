@@ -11,12 +11,12 @@ from pathlib import Path
 import streamlit as st
 
 pycaret_example_dir = Path(".").absolute()
-
+os.chdir(pycaret_example_dir)
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
 @st.cache
 def delete_exp_env(path=pycaret_example_dir,
-                   ignore_dir=["__pycache__",".git", "env"]):
+                   ignore_dir=["__pycache__",".git", "env", "sample_data"]):
     # from app import Pycaret_CLI
     try:
         remove_glob("*.zip")
@@ -26,6 +26,11 @@ def delete_exp_env(path=pycaret_example_dir,
         remove_glob("*.log")
     except:
         pass
+    try:
+        remove_glob("*.csv")
+    except:
+        pass
+
 
     dir_list = [d for d in os.listdir(path=pycaret_example_dir) \
                 if (os.path.isdir(d) and not d in ignore_dir)]
@@ -49,7 +54,7 @@ def get_binary_file_downloader_html(bin_file, file_label='File'):
 
 st.sidebar.image("logo.png", width=200)
 st.sidebar.markdown(
-    "# Auto-ML-GUI using pycaret by 3323 Y.Ogasawara"
+    "# Auto-ML-GUI using pycaret by Toroi"
 )
 
 exp_name = st.sidebar.text_input(
@@ -69,14 +74,11 @@ if st.sidebar.button("Initialize"):
 
 def main():
 
-    target = False
     ignore_features = False
 
     uploaded_training_file = None
     uploaded_test_file = None
     # uploaded_setting_file = None
-
-    path_setting_file = "setting.csv"
 
     target = st.text_input("target")
 
@@ -123,34 +125,30 @@ def main():
     if st.button("Start!!"):
         if uploaded_training_file is not None and uploaded_test_file is not None:
             work_dir = os.getcwd()
-            base_setting = pd.read_csv("base_setting.csv", index_col=0)
-            train = pd.read_csv(uploaded_training_file)
-            test = pd.read_csv(uploaded_test_file)
-            setting = base_setting.copy()
-            setting.loc["exp_name", "property0"] = exp_name
-            setting.loc["target", "property0"] = target
-            setting.loc["models", "property0"] = "_".join(model_list)
-            setting.loc["metric", "property0"] = metric
-            setting.loc["mode", "property0"] = mode
-
-            st.dataframe(setting)
-            train.to_csv(setting.loc["path_training_file", "property0"], index=False)
-            test.to_csv(setting.loc["path_test_file", "property0"], index=False)
-
-            setting.to_csv(path_setting_file)
+            df_train = pd.read_csv(uploaded_training_file)
+            df_test = pd.read_csv(uploaded_test_file)
 
             with st.spinner("Training..."):
                 print(mode)
                 if mode == "regression":
-                    from app_reg import Pycaret_CLI
+                    from app_regression import Pycaret_CLI
                 elif mode == "classification":
-                    from app_cls import Pycaret_CLI
+                    from app_classification import Pycaret_CLI
 
-                pcl = Pycaret_CLI(path_setting_file, model_list)
-                exp = pcl.setup_automl_env(train)
+                pcl = Pycaret_CLI(df_train,
+                                  df_test,
+                                  model_list,
+                                  target,
+                                  metric,
+                                  module="compare",
+                                  exp_name=exp_name,
+                                  ignore_features=None
+                                  )
+
+                exp = pcl.setup_automl_env()
                 best_model = pcl.training_model()
-                pred_result = pcl.prediction(best_model, test)
-                pcl.model_image(best_model)
+                pred_result = pcl.prediction(best_model, df_test)
+                # pcl.model_image(best_model)
                 os.chdir(work_dir)
                 st.success("Done!")
 
