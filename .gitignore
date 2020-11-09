@@ -8,23 +8,8 @@ env_linux/
 *.pyc
 __pycache__/
 
-instance/
-
-*.log
-
-catboost_info/
-
-Experiment0/
-old/
-
-/train.csv
-/test.csv
-
-/experiment*
-/mlruns
-
 !streamlit_ui.py
-!app_classification.py
-!app_regression.py
+!/app
+!/image
 !base_setting.csv
 !/sample_data

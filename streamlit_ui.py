@@ -52,7 +52,7 @@ def get_binary_file_downloader_html(bin_file, file_label='File'):
     return href
 
 
-st.sidebar.image("logo.png", width=200)
+st.sidebar.image("./image/logo.png", width=200)
 st.sidebar.markdown(
     "# Auto-ML-GUI using pycaret by Toroi"
 )
@@ -131,9 +131,9 @@ def main():
             with st.spinner("Training..."):
                 print(mode)
                 if mode == "regression":
-                    from app_regression import Pycaret_CLI
+                    from app.app_regression import Pycaret_CLI
                 elif mode == "classification":
-                    from app_classification import Pycaret_CLI
+                    from app.app_classification import Pycaret_CLI
 
                 pcl = Pycaret_CLI(df_train,
                                   df_test,
