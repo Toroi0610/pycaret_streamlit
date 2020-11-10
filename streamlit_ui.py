@@ -16,7 +16,10 @@ st.set_option('deprecation.showfileUploaderEncoding', False)
 
 @st.cache
 def delete_exp_env(path=pycaret_example_dir,
-                   ignore_dir=["__pycache__",".git", "env", "sample_data"]):
+                   ignore_dir=["__pycache__",
+                               ".git", "env", 
+                               "sample_data",
+                               "app", "image"]):
     # from app import Pycaret_CLI
     try:
         remove_glob("*.zip")
