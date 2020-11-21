@@ -64,8 +64,8 @@ class Pycaret_CLI:
         # configure mlflow tracking
         # database
         # uri = f'sqlite:///{exp_dir.as_posix()}/experiment.db'
-        # mlflow.set_tracking_uri(uri)
         uri = f'file:///{exp_dir.as_posix()}/mlruns'
+        mlflow.set_tracking_uri(uri)
 
         # copy2(path_setting_file, setting_dir)
         # copy2(self.path_train_file, data_dir)

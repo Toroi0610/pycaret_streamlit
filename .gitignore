@@ -13,3 +13,4 @@ __pycache__/
 !/image
 !base_setting.csv
 !/sample_data
+!base_dir

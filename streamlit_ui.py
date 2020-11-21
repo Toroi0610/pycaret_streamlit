@@ -10,14 +10,11 @@ from pathlib import Path
 
 import streamlit as st
 
-pycaret_example_dir = Path(".").absolute()
-os.chdir(pycaret_example_dir)
-st.set_option('deprecation.showfileUploaderEncoding', False)
 
 @st.cache
-def delete_exp_env(path=pycaret_example_dir,
+def delete_exp_env(path,
                    ignore_dir=["__pycache__",
-                               ".git", "env", 
+                               ".git", "env",
                                "sample_data",
                                "app", "image"]):
     # from app import Pycaret_CLI
@@ -35,7 +32,7 @@ def delete_exp_env(path=pycaret_example_dir,
         pass
 
 
-    dir_list = [d for d in os.listdir(path=pycaret_example_dir) \
+    dir_list = [d for d in os.listdir(path) \
                 if (os.path.isdir(d) and not d in ignore_dir)]
     for d in dir_list:
         rmtree(d, ignore_errors=True)
@@ -54,6 +51,21 @@ def get_binary_file_downloader_html(bin_file, file_label='File'):
     href = f'<a href="data:application/octet-stream;base64,{bin_str}" download="{os.path.basename(bin_file)}">Download result {file_label}</a>'
     return href
 
+@st.cache
+def find_base_dir():
+    pycaret_example_dir = Path(".").absolute()
+    base_dir = pycaret_example_dir / "base_dir"
+    if base_dir.exists():
+        os.chdir(pycaret_example_dir)
+    else:
+        pycaret_example_dir = pycaret_example_dir.parent
+        os.chdir(pycaret_example_dir)
+        return find_base_dir()
+
+
+find_base_dir()
+pycaret_base_dir = os.getcwd()
+st.set_option('deprecation.showfileUploaderEncoding', False)
 
 st.sidebar.image("./image/logo.png", width=200)
 st.sidebar.markdown(
@@ -71,7 +83,7 @@ mode = st.sidebar.selectbox(
 )
 
 if st.sidebar.button("Initialize"):
-    delete_exp_env()
+    delete_exp_env(path=pycaret_base_dir)
 
 
 
@@ -158,8 +170,8 @@ def main():
                 make_archive(pcl.exp_name, 'zip', root_dir=pcl.exp_dir)
                 st.markdown(get_binary_file_downloader_html(f'{pcl.exp_name}.zip', 'ZIP'), unsafe_allow_html=True)
 
-                hostname = gethostname()
-                href = f'<a href="http://{hostname}:5000" \
+                ip_address = gethostbyname(gethostname())
+                href = f'<a href="http://{ip_address}:5000" \
                         target="_blank" rel="noopener noreferrer">\
                         Move to mlflow server</a>'
 
